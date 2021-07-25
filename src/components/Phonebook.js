@@ -5,6 +5,7 @@ class Phonebook extends React.Component {
     contacts: [],
     name: '',
     number: '',
+    filter: '',
   };
 
   nameInputId = shortid.generate();
@@ -63,6 +64,16 @@ class Phonebook extends React.Component {
           </button>
         </form>
         <h2>Contacts</h2>
+        <p>Find contacts by name</p>
+        <input
+          type="text"
+          name="name"
+          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+          title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
+          required
+          //onChange={}
+        />
+
         <ul>
           {contacts.map(
             ({ id, name, number }) =>
