@@ -1,5 +1,8 @@
 import React from 'react';
 import shortid from 'shortid';
+import ContactForm from './ContactForm';
+import Filter from './Filter';
+import ContactList from './ContactList';
 class Phonebook extends React.Component {
   state = {
     contacts: [],
@@ -7,12 +10,20 @@ class Phonebook extends React.Component {
     number: '',
     filter: '',
   };
-
   nameInputId = shortid.generate();
   numberInputId = shortid.generate();
+
   handleChange = event => {
     const { name, value } = event.target;
     this.setState({ [name]: value });
+
+    this.setState(prevState => ({
+      contacts: prevState.contacts.map(
+        contact =>
+          contact.name.toLowerCase() === value.toLowerCase() &&
+          alert('is alredy in contact'),
+      ),
+    }));
   };
   reset = () => {
     this.setState({ name: '', number: '' });
@@ -24,68 +35,46 @@ class Phonebook extends React.Component {
       name: name,
       number: number,
     };
-    console.log(contact, name.length, number.length);
-    this.setState(prevSate => ({
-      contacts: [contact, ...prevSate.contacts],
+    this.setState(({ contacts }) => ({
+      contacts: [contact, ...contacts],
     }));
+
     this.reset();
   };
+  findContact = event => {
+    const { name, value } = event.target;
+    this.setState({ [name]: value });
+  };
+  getFilterContacts = () => {
+    const { filter, contacts } = this.state;
+    const normalizeFilter = filter.toLowerCase();
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizeFilter),
+    );
+  };
+  deletContact = id => {
+    this.setState(prevState => ({
+      contacts: prevState.contacts.filter(contact => contact.id !== id),
+    }));
+  };
   render() {
-    const { name, number, contacts } = this.state;
+    const { name, number, filter } = this.state;
+    const filterContacts = this.getFilterContacts();
     return (
-      <>
+      <div>
         <h2>Phonebook</h2>
-        <form>
-          <p>Name</p>
-          <input
-            type="text"
-            name="name"
-            pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-            title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
-            required
-            value={name}
-            id={this.nameInputId}
-            onChange={this.handleChange}
-          />
-          <p>Number</p>
-          <input
-            type="tel"
-            name="number"
-            pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-            title="Номер телефона должен состоять цифр и может содержать пробелы, тире, круглые скобки и может начинаться с +"
-            required
-            value={number}
-            id={this.numberInputId}
-            onChange={this.handleChange}
-          />
-
-          <button type="button" onClick={this.handleAppend}>
-            Add contact
-          </button>
-        </form>
-        <h2>Contacts</h2>
-        <p>Find contacts by name</p>
-        <input
-          type="text"
-          name="name"
-          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-          title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
-          required
-          //onChange={}
+        <ContactForm
+          name={name}
+          number={number}
+          onChange={this.handleChange}
+          onHandleAppend={this.handleAppend}
+          nameId={this.nameInputId}
+          numberId={this.numberInputId}
         />
-
-        <ul>
-          {contacts.map(
-            ({ id, name, number }) =>
-              name.length > 0 &&
-              number.length > 0 && (
-                <li key={id}>
-                  {name}:{number}{' '}
-                </li>
-              ),
-          )}
-        </ul>
-      </>
+        <h2>Contacts</h2>
+        <Filter filter={filter} onChange={this.findContact} />
+        <ContactList contacts={filterContacts} onDelete={this.deletContact} />
+      </div>
     );
   }
 }
