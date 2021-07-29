@@ -16,32 +16,29 @@ class Phonebook extends React.Component {
   handleChange = event => {
     const { name, value } = event.target;
     this.setState({ [name]: value });
-
-    this.setState(prevState => ({
-      contacts: prevState.contacts.map(
-        contact =>
-          contact.name.toLowerCase() === value.toLowerCase() &&
-          alert('is alredy in contact'),
-      ),
-    }));
   };
+
   reset = () => {
     this.setState({ name: '', number: '' });
   };
+
   handleAppend = () => {
     const { name, number } = this.state;
-    const contact = {
+    const contactNew = {
       id: shortid.generate(),
       name: name,
       number: number,
     };
-    this.setState(({ contacts }) => ({
-      contacts: [contact, ...contacts],
-    }));
+    this.noAddContact() === undefined
+      ? this.setState(({ contacts }) => ({
+          contacts: [contactNew, ...contacts],
+        }))
+      : alert(`${name} is alredy in contact`);
 
     this.reset();
   };
-  findContact = event => {
+
+  getСontactSearch = event => {
     const { name, value } = event.target;
     this.setState({ [name]: value });
   };
@@ -56,6 +53,13 @@ class Phonebook extends React.Component {
     this.setState(prevState => ({
       contacts: prevState.contacts.filter(contact => contact.id !== id),
     }));
+  };
+  noAddContact = () => {
+    const { name, contacts } = this.state;
+    const find = contacts.find(
+      contact => contact.name.toLowerCase() === name.toLowerCase(),
+    );
+    return find;
   };
   render() {
     const { name, number, filter } = this.state;
@@ -72,7 +76,7 @@ class Phonebook extends React.Component {
           numberId={this.numberInputId}
         />
         <h2>Contacts</h2>
-        <Filter filter={filter} onChange={this.findContact} />
+        <Filter filter={filter} onChange={this.getСontactSearch} />
         <ContactList contacts={filterContacts} onDelete={this.deletContact} />
       </div>
     );
