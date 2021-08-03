@@ -62,6 +62,19 @@ class Phonebook extends React.Component {
     );
     return find;
   };
+
+  componentDidMount() {
+    const prevContacts = localStorage.getItem('contacts');
+    const parceContacts = JSON.parse(prevContacts);
+    if (parceContacts) {
+      this.setState({ contacts: parceContacts });
+    }
+  }
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.contacts !== prevState.contacts) {
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+    }
+  }
   render() {
     const { name, number, filter } = this.state;
     const filterContacts = this.getFilterContacts();
